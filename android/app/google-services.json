@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "68685466211",
+    "firebase_url": "https://trainingstagebuch-f8308.firebaseio.com",
+    "project_id": "trainingstagebuch-f8308",
+    "storage_bucket": "trainingstagebuch-f8308.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68685466211:android:fa15edb1931b3f01c20656",
+        "android_client_info": {
+          "package_name": "com.example.trainingstagebuch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "68685466211-9sr2htn9s5k7jd0vecgssgtst7rjlg6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTA0w8ZZSEfjdeQiCqd2p5s5QOMOZAiyo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "68685466211-9sr2htn9s5k7jd0vecgssgtst7rjlg6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
