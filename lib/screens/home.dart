@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:trainingstagebuch/screens/analyse.dart';
-import 'package:trainingstagebuch/screens/essen.dart';
+import 'package:trainingstagebuch/screens/drawer/profile.dart';
+import 'package:trainingstagebuch/screens/essen/essen.dart';
+import 'package:trainingstagebuch/screens/drawer/settings.dart';
 import 'package:trainingstagebuch/screens/sport.dart';
 import 'package:trainingstagebuch/services/auth.service.dart';
 
@@ -18,16 +20,46 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Trainingstagebuch"),
-        leading: Icon(Icons.book),
-        actions: [
-          GestureDetector(
-            child: Icon(Icons.exit_to_app),
-            onTap: () => _logout(),
-          ),
-          SizedBox(
-            width: 10,
-          )
-        ],
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            SizedBox(
+              height: 150,
+              child: Container(
+                color: Colors.blue,
+                child: Center(
+                  child: Image(
+                    image: AssetImage("assets/logo_sport.png"),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ListTile(
+              title: Text("Einstellungen"),
+              leading: Icon(Icons.settings),
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Settings())),
+            ),
+            Divider(),
+            ListTile(
+              title: Text("Profil"),
+              leading: Icon(Icons.person),
+              onTap: () => Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Profile())),
+            ),
+            Divider(),
+            ListTile(
+              title: Text("Abmelden"),
+              leading: Icon(Icons.exit_to_app),
+              onTap: () => _logout(),
+            ),
+            Divider()
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.blue,

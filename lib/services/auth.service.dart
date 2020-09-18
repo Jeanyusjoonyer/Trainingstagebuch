@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   Future signIn(String email, String password) async {
     try {
       AuthResult res = await _auth.signInWithEmailAndPassword(
@@ -44,6 +43,15 @@ class AuthService {
 
   Stream<FirebaseUser> get user {
     return _auth.onAuthStateChanged;
+  }
+
+  Future<FirebaseUser> getUser() async {
+    return await _auth.currentUser();
+  }
+
+  Future<String> getToken() async {
+    FirebaseUser user = await getUser();
+    return (await user.getIdToken()).token;
   }
 
   Future signOut() async {
