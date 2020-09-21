@@ -17,8 +17,7 @@ class EssenState extends State<Essen> {
 
   @override
   void initState() {
-    setDate(new DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day));
+    setDate(_cs.getDate());
     super.initState();
   }
 
@@ -31,9 +30,20 @@ class EssenState extends State<Essen> {
       setState(() {
         _statecontent = Content(
           day: _cs.getDay(),
+          updateCallback: update,
         );
       });
     }
+  }
+
+  update() async {
+    setState(() {
+      _statecontent = Content(
+        day: _cs.getDay(),
+        updateCallback: update,
+      );
+    });
+    await _cs.updateDay();
   }
 
   @override

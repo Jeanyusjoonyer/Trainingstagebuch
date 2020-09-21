@@ -6,7 +6,8 @@ import 'package:trainingstagebuch/screens/essen/notes.dart';
 
 class Content extends StatefulWidget {
   final Day day;
-  Content({this.day});
+  final updateCallback;
+  Content({this.day, this.updateCallback});
   @override
   _ContentState createState() => _ContentState();
 }
@@ -26,6 +27,7 @@ class _ContentState extends State<Content> {
         day: widget.day,
         meal: widget.day.breakfast,
         title: "Frühstück",
+        updateCallback: update,
       ),
       SizedBox(
         height: 10,
@@ -34,6 +36,7 @@ class _ContentState extends State<Content> {
         day: widget.day,
         meal: widget.day.lunch,
         title: "Mittagessen",
+        updateCallback: update,
       ),
       SizedBox(
         height: 10,
@@ -42,6 +45,7 @@ class _ContentState extends State<Content> {
         day: widget.day,
         meal: widget.day.dinner,
         title: "Abendessen",
+        updateCallback: update,
       ),
       SizedBox(
         height: 40,
@@ -104,5 +108,9 @@ class _ContentState extends State<Content> {
         height: 20,
       )
     ]));
+  }
+
+  update() {
+    widget.updateCallback();
   }
 }

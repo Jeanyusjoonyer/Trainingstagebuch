@@ -1,19 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:trainingstagebuch/models/day.model.dart';
+import 'package:trainingstagebuch/models/food.model.dart';
+import 'package:trainingstagebuch/screens/essen/details.dart';
 import 'package:trainingstagebuch/screens/essen/foodAdder.dart';
 
 class Meal extends StatefulWidget {
-  final dynamic meal;
+  final List<Food> meal;
   final Day day;
   final String title;
-  Meal({this.day, this.meal, this.title});
+  final updateCallback;
+  Meal({this.day, this.meal, this.title, this.updateCallback});
   @override
   _MealState createState() => _MealState();
 }
 
 class _MealState extends State<Meal> {
+  final SimpleDialog dia = SimpleDialog(
+    title: Text("Tagebuch"),
+    contentPadding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+    children: [
+      DecoratedBox(
+        child: ListTile(
+          title: Text("Eintrag löschen"),
+          leading: Icon(Icons.delete),
+          onTap: () => {},
+        ),
+        decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.grey[100]))),
+      ),
+      DecoratedBox(
+        child: ListTile(
+          title: Text("Eintrag verschieben"),
+          leading: Icon(Icons.compare_arrows),
+        ),
+        decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.grey[100]))),
+      ),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> foodwidgets = getFoodTiles();
     return Column(
       children: [
         DecoratedBox(
@@ -43,12 +71,17 @@ class _MealState extends State<Meal> {
             ),
           ),
         ),
+        Column(
+          children: foodwidgets,
+        ),
         InkWell(
           onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => FoodAdder(
                         title: widget.title,
+                        day: widget.day,
+                        updateCallback: update,
                       ))),
           child: DecoratedBox(
             decoration: BoxDecoration(color: Colors.grey[100]),
@@ -76,5 +109,109 @@ class _MealState extends State<Meal> {
         ),
       ],
     );
+  }
+
+  update() {
+    widget.updateCallback();
+  }
+
+  List<Widget> getFoodTiles() {
+    List<Widget> list = [];
+    widget.meal.forEach((element) {
+      list.add(DecoratedBox(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Colors.grey[100]))),
+        child: ListTile(
+          title: Text(element.name),
+          subtitle: Text(element.description +
+              ", " +
+              element.amount.toString() +
+              " " +
+              element.unit.name),
+          trailing: Text(element.calories.toString()),
+          onTap: () => {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Details(
+                    food: element,
+                    title: "Eintrag bearbeiten",
+                  ),
+                ))
+          },
+          onLongPress: () => showDialog(
+            context: context,
+            builder: (context) => SimpleDialog(
+              title: Text(element.name),
+              contentPadding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              children: [
+                DecoratedBox(
+                  child: ListTile(
+                    title: Text("Eintrag löschen"),
+                    leading: Icon(Icons.delete),
+                    onTap: () => {
+                      widget.day.removeFoodfromMeal(element, widget.title),
+                      update(),
+                      Navigator.pop(context)
+                    },
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border(top: BorderSide(color: Colors.grey[100]))),
+                ),
+                DecoratedBox(
+                  child: ListTile(
+                    title: Text("Eintrag verschieben"),
+                    leading: Icon(Icons.compare_arrows),
+                    onTap: () => {
+                      Navigator.pop(context),
+                      showDialog(
+                        context: context,
+                        builder: (context) => SimpleDialog(
+                          title: Text("Verschieben nach..."),
+                          children: [
+                            ListTile(
+                              title: Text("Frühstück"),
+                              onTap: () => {
+                                widget.day.moveMeal(
+                                    element, widget.title, "Frühstück"),
+                                update(),
+                                Navigator.pop(context)
+                              },
+                            ),
+                            ListTile(
+                              title: Text("Mittagessen"),
+                              onTap: () => {
+                                widget.day.moveMeal(
+                                    element, widget.title, "Mittagessen"),
+                                update(),
+                                Navigator.pop(context)
+                              },
+                            ),
+                            ListTile(
+                              title: Text("Abendessen"),
+                              onTap: () => {
+                                widget.day.moveMeal(
+                                    element, widget.title, "Abendessen"),
+                                update(),
+                                Navigator.pop(context)
+                              },
+                            )
+                          ],
+                          contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 0),
+                        ),
+                      )
+                    },
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border(top: BorderSide(color: Colors.grey[100]))),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ));
+    });
+    return list;
   }
 }

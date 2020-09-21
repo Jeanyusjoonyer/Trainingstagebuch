@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:trainingstagebuch/models/day.model.dart';
 import 'package:trainingstagebuch/services/food.service.dart';
 
 class FoodAdder extends StatefulWidget {
   final String title;
-  FoodAdder({this.title});
+  final Day day;
+  final updateCallback;
+  FoodAdder({this.title, this.day, this.updateCallback});
   @override
   _FoodAdderState createState() => _FoodAdderState();
 }
@@ -13,6 +16,7 @@ class _FoodAdderState extends State<FoodAdder> {
   final FoodService fs = FoodService();
   final _controller = TextEditingController();
   List<Widget> list = [];
+  bool loading = true;
   @override
   void initState() {
     init();
@@ -22,8 +26,15 @@ class _FoodAdderState extends State<FoodAdder> {
   init() async {
     await fs.fetchFood();
     setState(() {
-      list = fs.getFoodTiles();
+      loading = false;
+      list = fs.getFoodTiles(widget.day.getMealFromName(widget.title),
+          widget.day, widget.title, update);
     });
+  }
+
+  update() {
+    widget.updateCallback();
+    Navigator.pop(context);
   }
 
   @override
@@ -35,12 +46,6 @@ class _FoodAdderState extends State<FoodAdder> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(widget.title),
-          actions: [
-            Icon(Icons.check),
-            SizedBox(
-              width: 10,
-            )
-          ],
         ),
         body: Column(
           children: [
@@ -109,11 +114,18 @@ class _FoodAdderState extends State<FoodAdder> {
                 Divider(),
               ],
             ),
-            SingleChildScrollView(
-              child: Column(
-                children: list,
-              ),
-            )
+            loading
+                ? Expanded(
+                    child: Center(
+                    child: SpinKitThreeBounce(
+                      color: Colors.blue,
+                    ),
+                  ))
+                : SingleChildScrollView(
+                    child: Column(
+                      children: list,
+                    ),
+                  )
           ],
         ));
   }

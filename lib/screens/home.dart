@@ -14,9 +14,12 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _index = 1;
   final _auth = AuthService();
-  final content = [Essen(), Sport(), Analyse()];
+  Essen essen = Essen();
+  Sport sport = Sport();
+  Analyse analyse = Analyse();
   @override
   Widget build(BuildContext context) {
+    List content = [essen, sport, analyse];
     return Scaffold(
       appBar: AppBar(
         title: Text("Trainingstagebuch"),
