@@ -3,6 +3,7 @@ import 'package:trainingstagebuch/models/day.model.dart';
 import 'package:trainingstagebuch/screens/essen/calories.dart';
 import 'package:trainingstagebuch/screens/essen/meal.dart';
 import 'package:trainingstagebuch/screens/essen/notes.dart';
+import 'package:trainingstagebuch/screens/essen/nutritions.dart';
 
 class Content extends StatefulWidget {
   final Day day;
@@ -56,7 +57,15 @@ class _ContentState extends State<Content> {
             width: 150,
             height: 50,
             child: RaisedButton(
-              onPressed: () => {},
+              onPressed: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Nutritions(
+                        day: widget.day,
+                      ),
+                    ))
+              },
               color: Colors.blue,
               textColor: Colors.white,
               child: Row(

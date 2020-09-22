@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:trainingstagebuch/models/day.model.dart';
 import 'package:trainingstagebuch/models/food.model.dart';
@@ -115,6 +117,14 @@ class _MealState extends State<Meal> {
     widget.updateCallback();
   }
 
+  updateFood(Food element, Food updatedElement) {
+    setState(() {
+      widget.day.updateFoodInMeal(widget.title, element, updatedElement);
+    });
+    update();
+    Navigator.pop(context);
+  }
+
   List<Widget> getFoodTiles() {
     List<Widget> list = [];
     widget.meal.forEach((element) {
@@ -129,13 +139,16 @@ class _MealState extends State<Meal> {
               element.amount.toString() +
               " " +
               element.unit.name),
-          trailing: Text(element.calories.toString()),
+          trailing: Text(element.getCalories().toString()),
           onTap: () => {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => Details(
-                    food: element,
+                    food: Food.fromJson(
+                        json.decode(json.encode(element.toJson()))),
+                    origin: element,
+                    mealCallback: updateFood,
                     title: "Eintrag bearbeiten",
                   ),
                 ))

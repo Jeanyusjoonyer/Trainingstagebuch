@@ -1,8 +1,10 @@
 import 'package:trainingstagebuch/models/food.model.dart';
+import 'package:trainingstagebuch/models/goal.model.dart';
 
 class Day {
   String id, date, notes;
-  int goal, current;
+  int current;
+  Goal goal;
   List<Food> breakfast, lunch, dinner;
   Day(
       {this.date,
@@ -17,7 +19,7 @@ class Day {
       : id = json['id'],
         date = json['data']['date'],
         notes = json['data']['notes'],
-        goal = json['data']['goal'],
+        goal = transformGoal(json['data']['goal']),
         current = json['data']['current'],
         breakfast = transform(json['data']['breakfast']),
         lunch = transform(json['data']['lunch']),
@@ -27,7 +29,7 @@ class Day {
         "id": id,
         "date": date,
         "notes": notes,
-        "goal": goal,
+        "goal": goal.toJson(),
         "current": current,
         "breakfast": breakfast,
         "lunch": lunch,
@@ -42,14 +44,18 @@ class Day {
     return res;
   }
 
+  static Goal transformGoal(obj) {
+    return Goal.fromJson(obj);
+  }
+
   int getRest() {
-    return goal - current;
+    return goal.kcal - current;
   }
 
   int sumMeal(List<Food> meal) {
     int sum = 0;
     meal.forEach((food) {
-      sum += food.calories;
+      sum += food.getCalories();
     });
     return sum;
   }
@@ -59,33 +65,13 @@ class Day {
   }
 
   void addFoodtoMeal(Food food, String mealName) {
-    switch (mealName) {
-      case "Frühstück":
-        breakfast.add(food);
-        break;
-      case "Mittagessen":
-        lunch.add(food);
-        break;
-      case "Abendessen":
-        dinner.add(food);
-        break;
-    }
-    current += food.calories;
+    getMealFromName(mealName).add(food);
+    updateCurrent();
   }
 
   void removeFoodfromMeal(Food food, String mealName) {
-    switch (mealName) {
-      case "Frühstück":
-        breakfast.remove(food);
-        break;
-      case "Mittagessen":
-        lunch.remove(food);
-        break;
-      case "Abendessen":
-        dinner.remove(food);
-        break;
-    }
-    current -= food.calories;
+    getMealFromName(mealName).remove(food);
+    updateCurrent();
   }
 
   void moveMeal(Food food, String from, String to) {
@@ -109,5 +95,65 @@ class Day {
       default:
         return null;
     }
+  }
+
+  void updateFoodInMeal(String mealName, Food old, Food food) {
+    getMealFromName(mealName)[getMealFromName(mealName).indexOf(old)] = food;
+    updateCurrent();
+  }
+
+  void updateCurrent() {
+    current = 0;
+    breakfast.forEach((food) {
+      current += food.getCalories();
+    });
+    lunch.forEach((food) {
+      current += food.getCalories();
+    });
+    dinner.forEach((food) {
+      current += food.getCalories();
+    });
+  }
+
+  double getCarbs() {
+    double carbs = 0;
+    breakfast.forEach((food) {
+      carbs += food.getCarbs();
+    });
+    lunch.forEach((food) {
+      carbs += food.getCarbs();
+    });
+    dinner.forEach((food) {
+      carbs += food.getCarbs();
+    });
+    return carbs;
+  }
+
+  double getFats() {
+    double fats = 0;
+    breakfast.forEach((food) {
+      fats += food.getFats();
+    });
+    lunch.forEach((food) {
+      fats += food.getFats();
+    });
+    dinner.forEach((food) {
+      fats += food.getFats();
+    });
+    return fats;
+  }
+
+  double getProteins() {
+    double proteins = 0;
+    breakfast.forEach((food) {
+      proteins += food.getProteins();
+    });
+    lunch.forEach((food) {
+      proteins += food.getProteins();
+    });
+    dinner.forEach((food) {
+      proteins += food.getProteins();
+    });
+    return proteins;
   }
 }

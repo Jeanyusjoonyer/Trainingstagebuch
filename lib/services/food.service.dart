@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:trainingstagebuch/models/day.model.dart';
 import 'package:trainingstagebuch/models/food.model.dart';
+import 'package:trainingstagebuch/screens/essen/details.dart';
 
 class FoodService {
   List<Food> food = [];
@@ -26,19 +27,30 @@ class FoodService {
     }
   }
 
-  List<Widget> getFoodTiles(List<Food> meal, Day day, String mealName, update) {
+  List<Widget> getFoodTiles(BuildContext context, callback) {
     List<Widget> list = [];
     food.forEach((element) {
-      list.add(ListTile(
-        title: Text(element.name),
-        subtitle: Text(element.description +
-            ", " +
-            element.amount.toString() +
-            " " +
-            element.unit.name),
-        trailing: Text(element.calories.toString()),
-        onTap: () => {day.addFoodtoMeal(element, mealName), update()},
-      ));
+      list.add(
+        ListTile(
+            title: Text(element.name),
+            subtitle: Text(element.description +
+                ", " +
+                element.amount.toString() +
+                " " +
+                element.unit.name),
+            trailing: Text(element.getCalories().toString()),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Details(
+                    food: Food.fromJson(
+                        json.decode(json.encode(element.toJson()))),
+                    origin: null,
+                    title: "Nahrungsmittel hinzufügen",
+                    mealCallback: callback,
+                  ),
+                ))),
+      );
       list.add(Divider());
     });
     return list;

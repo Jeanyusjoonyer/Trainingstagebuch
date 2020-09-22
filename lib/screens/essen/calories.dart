@@ -36,7 +36,7 @@ class _CaloriesState extends State<Calories> {
                 Column(
                   children: [
                     Text(
-                      widget.day.goal.toString(),
+                      widget.day.goal.kcal.toString(),
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(

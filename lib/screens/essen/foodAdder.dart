@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:trainingstagebuch/models/day.model.dart';
+import 'package:trainingstagebuch/models/food.model.dart';
 import 'package:trainingstagebuch/services/food.service.dart';
 
 class FoodAdder extends StatefulWidget {
@@ -27,14 +28,22 @@ class _FoodAdderState extends State<FoodAdder> {
     await fs.fetchFood();
     setState(() {
       loading = false;
-      list = fs.getFoodTiles(widget.day.getMealFromName(widget.title),
-          widget.day, widget.title, update);
+      list = fs.getFoodTiles(context, check);
     });
   }
 
   update() {
     widget.updateCallback();
     Navigator.pop(context);
+  }
+
+  check(Food origin, Food food) {
+    setState(() {
+      widget.day.addFoodtoMeal(food, widget.title);
+    });
+    Navigator.pop(context);
+    Navigator.pop(context);
+    widget.updateCallback();
   }
 
   @override

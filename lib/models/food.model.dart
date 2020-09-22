@@ -59,4 +59,20 @@ class Food {
     });
     return res;
   }
+
+  int getCalories() {
+    return (calories * unit.factor * (amount / 100)).round();
+  }
+
+  double getCarbs() {
+    return (carbs * unit.factor * (amount / 100));
+  }
+
+  double getFats() {
+    return (fats * unit.factor * (amount / 100));
+  }
+
+  double getProteins() {
+    return (protein * unit.factor * (amount / 100));
+  }
 }
