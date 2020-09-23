@@ -59,4 +59,22 @@ class FoodService {
   List<Food> getFood() {
     return food;
   }
+
+  Future<String> addFood(Food food) async {
+    try {
+      var res = await http.post(
+          "https://europe-west3-trainingstagebuch-f8308.cloudfunctions.net/food",
+          body: {"food": json.encode(food.toJson())});
+
+      if (res.statusCode == 200) {
+        return res.body;
+      } else {
+        print(res.body);
+        return null;
+      }
+    } catch (err) {
+      print(err);
+      return null;
+    }
+  }
 }
