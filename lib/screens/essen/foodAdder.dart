@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:badges/badges.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:trainingstagebuch/models/day.model.dart';
 import 'package:trainingstagebuch/models/food.model.dart';
 import 'package:trainingstagebuch/screens/essen/details.dart';
 import 'package:trainingstagebuch/screens/essen/foodCreator.dart';
+import 'package:trainingstagebuch/screens/essen/chipDialog.dart';
 import 'package:trainingstagebuch/services/food.service.dart';
 
 class FoodAdder extends StatefulWidget {
@@ -22,6 +25,8 @@ class _FoodAdderState extends State<FoodAdder> {
   final _controller = TextEditingController();
   List<Widget> list = [];
   bool loading = true;
+  String regex;
+  List<String> regexcat = [];
   @override
   void initState() {
     init();
@@ -32,7 +37,7 @@ class _FoodAdderState extends State<FoodAdder> {
     await fs.fetchFood();
     setState(() {
       loading = false;
-      list = fs.getFoodTiles(context, check);
+      list = fs.getFoodTiles(context, check, regex, regexcat);
     });
   }
 
@@ -45,7 +50,7 @@ class _FoodAdderState extends State<FoodAdder> {
     food.id = await fs.addFood(food);
     setState(() {
       fs.food.add(food);
-      list = fs.getFoodTiles(context, check);
+      list = fs.getFoodTiles(context, check, regex, regexcat);
     });
     Navigator.pop(context);
     Navigator.push(
@@ -69,111 +74,148 @@ class _FoodAdderState extends State<FoodAdder> {
     widget.updateCallback();
   }
 
+  scan() async {
+    final ScanResult res = await BarcodeScanner.scan();
+    await fs.searchFood(res.rawContent);
+  }
+
+  filter(String regex) {
+    setState(() {
+      regex = regex;
+      list = fs.getFoodTiles(context, check, regex, regexcat);
+    });
+  }
+
+  filterCallback(List<String> cats) {
+    setState(() {
+      regexcat = cats;
+      list = fs.getFoodTiles(context, check, regex, regexcat);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FoodCreator(
-                    day: widget.day,
-                    foodAdderCallback: created,
-                  ),
-                )),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
           ),
-          SizedBox(width: 10),
-        ],
-      ),
-      body: Column(
-        children: [
-          Column(
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 20,
-                  ),
-                  SizedBox(
-                    width: 300,
-                    child: TextFormField(
-                      controller: _controller,
-                      textAlignVertical: TextAlignVertical.center,
-                      decoration: InputDecoration(
-                          hintText: "Nahrungsmittel suchen",
-                          hintStyle:
-                              TextStyle(fontSize: 12, color: Colors.grey),
-                          contentPadding: EdgeInsets.all(10),
-                          border: InputBorder.none,
-                          fillColor: Colors.grey[200],
-                          filled: true,
-                          prefixIcon: Icon(Icons.search),
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () => _controller.clear(),
-                          )),
+          title: Text(widget.title),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FoodCreator(
+                      day: widget.day,
+                      foodAdderCallback: created,
                     ),
-                  ),
-                  SizedBox(
-                    width: 25,
-                  ),
-                  Icon(
-                    Icons.center_focus_strong,
-                    color: Colors.blue,
-                    size: 35,
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
+                  )),
+            ),
+            SizedBox(width: 10),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Column(
                 children: [
                   SizedBox(
-                    width: 20,
+                    height: 20,
                   ),
-                  Text(
-                    "Filter:",
-                    style: TextStyle(fontSize: 20),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 20,
+                      ),
+                      SizedBox(
+                        width: 300,
+                        child: TextFormField(
+                          controller: _controller,
+                          textAlignVertical: TextAlignVertical.center,
+                          decoration: InputDecoration(
+                              hintText: "Nahrungsmittel suchen",
+                              hintStyle:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                              contentPadding: EdgeInsets.all(10),
+                              border: InputBorder.none,
+                              fillColor: Colors.grey[200],
+                              filled: true,
+                              prefixIcon: Icon(Icons.search),
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () =>
+                                    {_controller.clear(), filter("")},
+                              )),
+                          onChanged: (value) => filter(value),
+                          autofocus: false,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 25,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.center_focus_strong,
+                          color: Colors.blue,
+                          size: 35,
+                        ),
+                        onPressed: () => scan(),
+                      )
+                    ],
                   ),
                   SizedBox(
-                    width: 20,
+                    height: 5,
                   ),
-                  Chip(
-                    label: Icon(Icons.filter_list),
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  )
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        "Filter:",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      InkWell(
+                        child: Badge(
+                          child: Chip(
+                            label: Icon(Icons.filter_list),
+                            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          ),
+                          badgeContent: Text(regexcat.length.toString()),
+                          badgeColor: Colors.blue,
+                        ),
+                        onTap: () => showDialog(
+                            context: context,
+                            builder: (context) => ChipDialog(
+                                  categories: List<String>.from(regexcat),
+                                  callback: filterCallback,
+                                )),
+                      )
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.start,
+                  ),
+                  Divider(),
                 ],
-                mainAxisAlignment: MainAxisAlignment.start,
               ),
-              Divider(),
+              loading
+                  ? Center(
+                      child: SpinKitThreeBounce(
+                        color: Colors.blue,
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                        children: list,
+                      ),
+                    )
             ],
           ),
-          loading
-              ? Expanded(
-                  child: Center(
-                  child: SpinKitThreeBounce(
-                    color: Colors.blue,
-                  ),
-                ))
-              : SingleChildScrollView(
-                  child: Column(
-                    children: list,
-                  ),
-                )
-        ],
-      ),
-    );
+        ));
   }
 }

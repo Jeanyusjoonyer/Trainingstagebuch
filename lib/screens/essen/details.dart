@@ -12,6 +12,19 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
+  getChips() {
+    List<Widget> list = [];
+    widget.food.categories.forEach((category) {
+      list.add(SizedBox(
+        width: 10,
+      ));
+      list.add(Chip(
+        label: Text(category),
+      ));
+    });
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem> items = getUnitItems();
@@ -208,7 +221,7 @@ class _DetailsState extends State<Details> {
                       height: 5,
                     ),
                     Text(
-                      double.parse(widget.food.getCarbs().toStringAsFixed(1))
+                      double.parse(widget.food.getFats().toStringAsFixed(1))
                               .toString() +
                           " g",
                       style: TextStyle(fontSize: 20),
@@ -222,7 +235,14 @@ class _DetailsState extends State<Details> {
               ],
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             ),
-            Divider(color: Colors.grey)
+            Divider(color: Colors.grey),
+            Wrap(
+              children: getChips(),
+              alignment: WrapAlignment.start,
+            ),
+            Divider(
+              color: Colors.grey,
+            )
           ],
         ),
       ),

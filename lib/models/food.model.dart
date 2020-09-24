@@ -2,6 +2,7 @@ import 'package:trainingstagebuch/models/unit.mode.dart';
 
 class Food {
   String name, description, id;
+  List<String> categories;
   Unit unit;
   List<Unit> units;
   int calories;
@@ -10,6 +11,7 @@ class Food {
       {this.id,
       this.name,
       this.description,
+      this.categories,
       this.unit,
       this.units,
       this.calories,
@@ -21,6 +23,7 @@ class Food {
       : id = json['id'],
         name = json['name'],
         description = json['description'],
+        categories = transformToStringList(json['categories']),
         unit = Unit.fromJson(json['unit']),
         units = transform(json['units']),
         calories = json['calories'].toInt(),
@@ -33,6 +36,7 @@ class Food {
         "id": id,
         "name": name,
         "description": description,
+        "categories": categories,
         "unit": unit,
         "units": units,
         "calories": calories,
@@ -46,6 +50,14 @@ class Food {
     List<Unit> res = [];
     list.forEach((unit) {
       res.add(Unit.fromJson(unit));
+    });
+    return res;
+  }
+
+  static List<String> transformToStringList(List list) {
+    List<String> res = [];
+    list.forEach((category) {
+      res.add(category);
     });
     return res;
   }
